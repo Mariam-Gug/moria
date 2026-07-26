@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Moria Bookshop — a fantasy bookshop demo. Browse epic fantasy, grimdark and mythic fiction, fill a cart and check out. No real accounts, no real payments.">
+<meta name="author" content="Mariam Gugutishvili">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Moria Bookshop — the door to every world ever written">
+<meta property="og:description" content="Imagination is the only weapon in the war against reality. Arm yourself.">
+<meta property="og:image" content="img/logo.png">
+
+<link rel="icon" href="img/smile-website-title.png">
+<link rel="apple-touch-icon" href="img/smile-website-title.png">
+
+<title>Moria Bookshop — fantasy books</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cinzel:wght@400;500;600;700&family=Grenze:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=MedievalSharp&display=swap" rel="stylesheet">
+
+<script>
+/* Paints the saved theme onto <html> before the first frame, so a reader who
+   chose dark never gets a white flash. Falls back to the OS setting. */
+(function () {
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('moria_theme')); } catch (err) { /* ignore */ }
+  if (saved !== 'dark' && saved !== 'light') {
+    saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark' : 'light';
+  }
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+</script>
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skiplink" href="#view">Skip to content</a>
+
+<!-- ===== icon sprite ====================================================== -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2.3l2.4 11.3h9.6L19 7.2H6.2"/><circle cx="9.6" cy="19.2" r="1.5"/><circle cx="16.4" cy="19.2" r="1.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.4" r="3.7"/><path d="M4.9 20a7.2 7.2 0 0 1 14.2 0"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.6 7l.9 13h9l.9-13"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.3A8.3 8.3 0 0 1 9.7 4a8.4 8.4 0 1 0 10.3 10.3Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.7v2.1M12 19.2v2.1M4.3 4.3l1.5 1.5M18.2 18.2l1.5 1.5M2.7 12h2.1M19.2 12h2.1M4.3 19.7l1.5-1.5M18.2 5.8l1.5-1.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.6 4.5 4.4L19 7.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="m3.8 6.4 8.2 6.4 8.2-6.4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.4a12 12 0 0 0 6.1 6.1l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-6.1 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 14.9 12 21 12 21Z"/><circle cx="12" cy="10.4" r="2.4"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M14.5 8.5h2.3V5.4h-2.6c-2.3 0-3.8 1.5-3.8 3.9v1.4H8.2v3.1h2.2V21h3.3v-7.2h2.4l.4-3.1h-2.8V9.6c0-.7.3-1.1.8-1.1Z"/></symbol>
+  <symbol id="i-twitter" viewBox="0 0 24 24"><path d="M21 6.2a7 7 0 0 1-2 .6 3.5 3.5 0 0 0 1.5-1.9 7 7 0 0 1-2.2.9 3.4 3.4 0 0 0-5.9 2.3v.8A9.7 9.7 0 0 1 4.6 5a3.4 3.4 0 0 0 1 4.6 3.4 3.4 0 0 1-1.5-.4 3.4 3.4 0 0 0 2.7 3.4 3.4 3.4 0 0 1-1.5.1 3.4 3.4 0 0 0 3.2 2.4A6.8 6.8 0 0 1 3 16.6a9.7 9.7 0 0 0 15-8.2 7 7 0 0 0 1.7-1.8Z"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3.8" y="3.8" width="16.4" height="16.4" rx="4.6"/><circle cx="12" cy="12" r="3.9"/><circle cx="16.9" cy="7.1" r="1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.4 12S6 5.9 12 5.9 21.6 12 21.6 12 18 18.1 12 18.1 2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="3.1"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M9.9 5.2A9.4 9.4 0 0 1 12 5c6 0 9.6 6.1 9.6 6.1a17 17 0 0 1-2.7 3.4M6.4 7.3A16.7 16.7 0 0 0 2.4 12s3.6 6.1 9.6 6.1a9.2 9.2 0 0 0 3.3-.6"/><path d="M10.2 10a2.9 2.9 0 0 0 4 4.1"/><path d="M4 3.6 20.4 20"/></symbol>
+</svg>
+
+<!-- ===== loader ========================================================== -->
+<div class="loader" id="loader" role="status">
+  <img class="loader__dragon" src="img/Loader-dragon.gif" alt="">
+  <p class="loader__text">Waking the dragon…</p>
+</div>
+
+<!-- ===== header ========================================================== -->
+<header class="masthead" id="masthead">
+  <div class="masthead__row shell">
+
+    <a class="brand" href="#/" aria-label="Moria Bookshop, home">
+      <img class="brand__mark" src="img/logo.png" alt="" width="43" height="77">
+      <span class="brand__type">
+        <span class="brand__name">Moria</span>
+        <span class="brand__sub">Bookshop</span>
+      </span>
+    </a>
+
+    <!-- Live search. The dropdown is filled in by shell.js on every keystroke. -->
+    <div class="finder" id="finder" role="search">
+      <label class="sr-only" for="finder-input">Search books by title or author</label>
+      <svg class="finder__glass" aria-hidden="true"><use href="#i-search"/></svg>
+      <input class="finder__input" id="finder-input" type="search" name="q"
+             placeholder="Search by title or author…" autocomplete="off"
+             role="combobox" aria-controls="finder-results" aria-expanded="false">
+      <button class="finder__clear" id="finder-clear" type="button" aria-label="Clear search" hidden>
+        <svg aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+      <div class="results" id="finder-results" role="listbox" aria-label="Search results" hidden></div>
+    </div>
+
+    <div class="tools">
+      <button class="iconbtn tools__search" id="search-toggle" type="button"
+              aria-label="Search" aria-expanded="false">
+        <svg aria-hidden="true"><use href="#i-search"/></svg>
+      </button>
+
+      <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+        <svg class="tswap tswap--moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="tswap tswap--sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+
+      <button class="iconbtn" id="cart-btn" type="button" aria-label="Cart, empty">
+        <svg aria-hidden="true"><use href="#i-cart"/></svg>
+        <span class="badge" id="cart-badge" hidden>0</span>
+      </button>
+
+      <div class="account">
+        <button class="iconbtn" id="account-btn" type="button"
+                aria-label="Sign in" aria-expanded="false" aria-haspopup="true">
+          <svg aria-hidden="true"><use href="#i-user"/></svg>
+          <span class="account__pip" id="account-pip" hidden></span>
+        </button>
+
+        <!-- Shown only while signed in; signed out, the button opens the modal. -->
+        <div class="acctmenu" id="account-menu" hidden>
+          <p class="acctmenu__hi">Hi, <strong id="account-name">reader</strong></p>
+          <p class="acctmenu__note" id="account-race">Signed in to the demo shop.</p>
+          <button class="btn btn--quiet btn--sm btn--block" id="signout-btn" type="button">Sign out</button>
+        </div>
+      </div>
+
+      <button class="burger" id="burger" type="button" aria-label="Menu"
+              aria-expanded="false" aria-controls="mainnav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mainnav" id="mainnav" aria-label="Primary">
+    <ul class="shell mainnav__list">
+      <li><a href="#/">Home</a></li>
+      <li><a href="#/shop">Shop all</a></li>
+      <li><a href="#/shop?shelf=new">New arrivals</a></li>
+      <li><a href="#/shop?shelf=bestseller">Bestsellers</a></li>
+      <li><a href="#/contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- ===== routed view ===================================================== -->
+<main id="view" tabindex="-1"></main>
+
+<!-- ===== footer ========================================================== -->
+<footer class="footer">
+  <div class="shell footer__grid">
+
+    <div>
+      <h2 class="footer__brand">Moria Bookshop</h2>
+      <p class="footer__blurb">
+        Two floors, one very long staircase, and a dragon asleep in the stockroom.
+        We have sold fantasy out of the same building since the mountain was
+        quieter, and we still read everything before it reaches the shelf.
+      </p>
+      <ul class="social">
+        <li>
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
+            <svg aria-hidden="true"><use href="#i-facebook"/></svg>Facebook
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
+            <svg aria-hidden="true"><use href="#i-twitter"/></svg>Twitter
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+            <svg aria-hidden="true"><use href="#i-instagram"/></svg>Instagram
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="footer__head">Find us</h3>
+      <ul class="contactlist">
+        <li>
+          <svg aria-hidden="true"><use href="#i-pin"/></svg>
+          <span>118 Akaki Tsereteli Ave<br>Tbilisi, Georgia</span>
+        </li>
+        <li>
+          <svg aria-hidden="true"><use href="#i-mail"/></svg>
+          <a href="mailto:moriabookshop@gmail.com">moriabookshop@gmail.com</a>
+        </li>
+        <li>
+          <svg aria-hidden="true"><use href="#i-phone"/></svg>
+          <a href="tel:+995598748302">+995 598 74 83 02</a>
+        </li>
+      </ul>
+      <p class="footer__hours">Open 10:00–20:00, later if it is raining.</p>
+    </div>
+
+    <div>
+      <h3 class="footer__head">Join the army of readers</h3>
+      <p class="footer__blurb footer__blurb--tight">
+        One letter a month: what landed on the shelves, what we could not put down.
+      </p>
+
+      <form class="signup" id="signup-form" novalidate>
+        <label class="sr-only" for="signup-email">Email address</label>
+        <div class="signup__row">
+          <input class="signup__input" id="signup-email" type="email" name="email"
+                 placeholder="you@example.com" autocomplete="email"
+                 aria-describedby="signup-msg">
+          <button class="btn btn--accent" type="submit">Subscribe</button>
+        </div>
+        <p class="signup__msg" id="signup-msg" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="shell footer__base">
+    <p>© <span id="year">2026</span> Moria Bookshop · Forged in the dungeons of Moria</p>
+    <p class="footer__demo">Demo build — no real accounts, no real payments, nothing leaves this browser.</p>
+  </div>
+</footer>
+
+<!-- ===== cart drawer ===================================================== -->
+<div class="drawer" id="cart-drawer" hidden>
+  <div class="drawer__veil" id="cart-veil"></div>
+
+  <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <header class="drawer__top">
+      <h2 class="drawer__title" id="cart-title">Your cart</h2>
+      <button class="iconbtn" id="cart-close" type="button" aria-label="Close cart">
+        <svg aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </header>
+
+    <div class="drawer__body" id="cart-body"></div>
+
+    <footer class="drawer__foot" id="cart-foot" hidden>
+      <div class="drawer__sum">
+        <span>Subtotal</span>
+        <strong id="cart-subtotal">$0.00</strong>
+      </div>
+      <p class="drawer__note">Delivery by raven is calculated at checkout.</p>
+      <a class="btn btn--accent btn--block" id="cart-checkout" href="#/checkout">
+        Proceed to checkout
+        <svg aria-hidden="true"><use href="#i-right"/></svg>
+      </a>
+    </footer>
+  </aside>
+</div>
+
+<!-- ===== sign in / create account ======================================== -->
+<!-- This dialog closes only through the button in its top-right corner. The
+     veil is inert and Escape is swallowed, so a half-filled sign-up form
+     can't be thrown away by a stray click. -->
+<div class="modal" id="auth-modal" hidden>
+  <div class="modal__veil"></div>
+
+  <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <button class="modal__x" id="auth-close" type="button" aria-label="Close">
+      <svg aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+
+    <p class="eyebrow" id="auth-eyebrow">Speak, friend</p>
+    <h2 class="modal__title" id="auth-title">Sign in</h2>
+
+    <!-- ---- sign in ---- -->
+    <section id="pane-signin">
+      <p class="demohint">
+        <strong>Demo account.</strong>
+        <button class="demohint__fill" id="fill-demo" type="button">
+          reader-dwarf@moria.com / dragonfire123
+        </button>
+        Tap to fill it in, or make your own account below.
+      </p>
+
+      <form id="signin-form" novalidate>
+        <div class="field">
+          <label for="signin-email">Email</label>
+          <input id="signin-email" type="email" name="email" autocomplete="username"
+                 placeholder="reader-dwarf@moria.com">
+        </div>
+
+        <div class="field">
+          <label for="signin-password">Password</label>
+          <span class="peek">
+            <input id="signin-password" type="password" name="password"
+                   autocomplete="current-password" placeholder="••••••••">
+            <button class="peek__btn" type="button" data-peek="signin-password"
+                    aria-label="Show password" aria-pressed="false">
+              <svg aria-hidden="true"><use href="#i-eye"/></svg>
+            </button>
+          </span>
+        </div>
+
+        <p class="formerror" id="signin-error" role="alert"></p>
+        <button class="btn btn--accent btn--block" type="submit">Sign in</button>
+      </form>
+
+      <p class="modal__swap">
+        No account yet? <button type="button" id="go-register">Create one</button>
+      </p>
+    </section>
+
+    <!-- ---- create account ---- -->
+    <section id="pane-register" hidden>
+      <p class="demohint">
+        <strong>Saved in this browser only.</strong> There is no server behind
+        this form. Your account is written to localStorage in plain text, which
+        is fine for a demo and would never be acceptable for a real shop.
+      </p>
+
+      <form id="register-form" novalidate>
+        <div class="fieldpair">
+          <div class="field">
+            <label for="reg-username">Username</label>
+            <input id="reg-username" type="text" name="username" autocomplete="username"
+                   placeholder="Gimli" aria-describedby="err-username">
+            <span class="field__err" id="err-username"></span>
+          </div>
+
+          <div class="field">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" type="email" name="email" autocomplete="email"
+                   placeholder="you@example.com" aria-describedby="err-email">
+            <span class="field__err" id="err-email"></span>
+          </div>
+        </div>
+
+        <div class="fieldpair">
+          <div class="field">
+            <label for="reg-password">Password</label>
+            <span class="peek">
+              <input id="reg-password" type="password" name="password" autocomplete="new-password"
+                     placeholder="6 characters or more" aria-describedby="err-password">
+              <button class="peek__btn" type="button" data-peek="reg-password"
+                      aria-label="Show password" aria-pressed="false">
+                <svg aria-hidden="true"><use href="#i-eye"/></svg>
+              </button>
+            </span>
+            <span class="field__err" id="err-password"></span>
+          </div>
+
+          <div class="field">
+            <label for="reg-password2">Repeat password</label>
+            <span class="peek">
+              <input id="reg-password2" type="password" name="password2" autocomplete="new-password"
+                     placeholder="Type it again" aria-describedby="err-password2">
+              <button class="peek__btn" type="button" data-peek="reg-password2"
+                      aria-label="Show password" aria-pressed="false">
+                <svg aria-hidden="true"><use href="#i-eye"/></svg>
+              </button>
+            </span>
+            <span class="field__err" id="err-password2"></span>
+          </div>
+        </div>
+
+        <fieldset class="races">
+          <legend>Choose your race</legend>
+          <div class="races__grid">
+            <label class="race"><input type="radio" name="race" value="Noble dwarf"><span>Noble dwarf</span></label>
+            <label class="race"><input type="radio" name="race" value="Elf"><span>Elf</span></label>
+            <label class="race"><input type="radio" name="race" value="Human"><span>Human</span></label>
+            <label class="race"><input type="radio" name="race" value="Hobbit"><span>Hobbit</span></label>
+            <label class="race"><input type="radio" name="race" value="Wizard"><span>Wizard</span></label>
+            <label class="race"><input type="radio" name="race" value="Filthy orc"><span>Filthy orc</span></label>
+          </div>
+          <span class="field__err" id="err-race"></span>
+        </fieldset>
+
+        <p class="formerror" id="register-error" role="alert"></p>
+        <button class="btn btn--accent btn--block" type="submit">Create account</button>
+      </form>
+
+      <p class="modal__swap">
+        Already have one? <button type="button" id="go-signin">Sign in</button>
+      </p>
+    </section>
+  </div>
+</div>
+
+<!-- ===== toast =========================================================== -->
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/shell.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
