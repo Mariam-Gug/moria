@@ -14,7 +14,7 @@ const GENRES = [
   'Grimdark',
   'Dark Fantasy',
   'Adventure',
-  'Science Fantasy',
+  'Science Fiction',
   'Mythic'
 ];
 
@@ -101,7 +101,7 @@ const BOOKS = [
     title: 'Red Rising',
     author: 'Pierce Brown',
     price: 18.25,
-    genre: 'Science Fantasy',
+    genre: 'Science Fiction',
     year: 2014,
     pages: 400,
     cover: 'img/swiper/3.jpg',
@@ -435,6 +435,6 @@ const GENRE_TILES = [
   { genre: 'Grimdark',        image: 'img/swiper/13.jpg' },
   { genre: 'Dark Fantasy',    image: 'img/swiper/22.jpg' },
   { genre: 'Adventure',       image: 'img/swiper/16.jpg' },
-  { genre: 'Science Fantasy', image: 'img/swiper/3.jpg'  },
+  { genre: 'Science Fiction', image: 'img/swiper/3.jpg'  },
   { genre: 'Mythic',          image: 'img/swiper/24.jpg' }
 ];

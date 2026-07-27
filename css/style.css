@@ -51,8 +51,8 @@
   /* type */
   --display: 'MedievalSharp', 'Palatino Linotype', Georgia, serif;
   --label:   'Amatic SC', 'Trebuchet MS', sans-serif;
-  --nav:     'Cinzel', 'Palatino Linotype', Georgia, serif;
-  --body:    'Grenze', 'Palatino Linotype', Georgia, serif;
+  --nav:     'Texturina', 'Palatino Linotype', Georgia, serif;
+  --body:    'Texturina', 'Palatino Linotype', Georgia, serif;
 
   /* shape and depth — generous curves, closer to a stone arch than a card */
   --r-sm: 8px;
@@ -287,23 +287,22 @@ svg use, .sprite symbol {
   place-content: center;
   justify-items: center;
   gap: 18px;
-  background: var(--bg);
+  /* Sampled from img/Loader-dragon.gif so the frame edges disappear into the
+     page instead of sitting on a visible plate. */
+  background: #fcfcf4;
   transition: opacity var(--slow) var(--ease), visibility var(--slow);
 }
 .loader.is-gone { opacity: 0; visibility: hidden; }
 
-.loader__dragon {
-  width: min(280px, 62vw);
-  mix-blend-mode: multiply;
-}
-:root[data-theme='dark'] .loader__dragon { mix-blend-mode: screen; }
+.loader__dragon { width: min(300px, 66vw); }
 
 .loader__text {
   font-family: var(--label);
-  font-size: 1.6rem;
-  letter-spacing: .16em;
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: .18em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #6b6455;
 }
 
 /* ===== masthead ========================================================= */
@@ -349,7 +348,13 @@ svg use, .sprite symbol {
 }
 .brand:hover .brand__mark { transform: rotate(-8deg) scale(1.08); }
 
-.brand__type { display: grid; }
+/* One horizontal line, always — the name never stacks. */
+.brand__type {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  white-space: nowrap;
+}
 
 .brand__name {
   font-family: var(--display);
@@ -359,12 +364,11 @@ svg use, .sprite symbol {
 }
 
 .brand__sub {
-  font-family: var(--nav);
-  font-weight: 600;
-  font-size: .625rem;
-  line-height: 1.4;
-  letter-spacing: .3em;
-  text-transform: uppercase;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1;
+  letter-spacing: .01em;
   color: var(--chrome-gilt);
 }
 
@@ -725,20 +729,31 @@ svg use, .sprite symbol {
   .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.14fr); }
 }
 
+/* Everything in the hero is set in Amatic SC — it is the one place on the
+   page that runs entirely on the display voice. */
 .hero__title {
-  font-size: clamp(2.4rem, 7.4vw, 4.4rem);
-  line-height: 1.02;
-  margin: 14px 0 0;
+  font-family: var(--label);
+  font-weight: 700;
+  font-size: clamp(3.1rem, 9vw, 5.6rem);
+  line-height: .96;
+  letter-spacing: .01em;
+  margin: 10px 0 0;
 }
 .hero__title em {
   font-style: normal;
   color: var(--link);
 }
 
+/* The one piece of hero copy that stays in the text face — it runs the full
+   width of the headline box. */
 .hero__lede {
-  max-width: 44ch;
-  margin-top: 18px;
-  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  max-width: none;
+  margin-top: 16px;
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
+  line-height: 1.55;
+  letter-spacing: 0;
   color: var(--ink-soft);
 }
 
@@ -746,52 +761,75 @@ svg use, .sprite symbol {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 26px;
+}
+.hero .btn {
+  font-family: var(--label);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 
 .hero__facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 28px;
-  margin-top: 32px;
+  gap: 10px 34px;
+  margin-top: 30px;
   padding-top: 22px;
   border-top: 1px solid var(--line);
 }
-.hero__fact { display: grid; }
+
+/* Number on top, label under it, both centred on the same axis. */
+.hero__fact {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
 .hero__fact b {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 1.5rem;
-  line-height: 1.1;
+  font-family: var(--label);
+  font-weight: 700;
+  font-size: 2.1rem;
+  line-height: 1;
 }
 .hero__fact span {
   font-family: var(--label);
   font-weight: 700;
-  font-size: .95rem;
+  font-size: 1.05rem;
+  line-height: 1.2;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-/* The doorway. A stone surround, then the arched opening with the paintings
-   behind it — only the art cross-fades, the headline stays put. */
-.hero__arch {
-  padding: clamp(10px, 1.4vw, 16px);
-  background: linear-gradient(165deg, var(--line-strong), var(--bg-sink) 60%);
-  border: 1px solid var(--line-strong);
-  border-radius: 50% 50% var(--r-lg) var(--r-lg) / 26% 26% 3% 3%;
-  box-shadow: var(--sh-2);
-}
-:root[data-theme='dark'] .hero__arch {
-  background: linear-gradient(165deg, #2c3035, var(--bg-sink) 60%);
-}
+/* The doorway: a pointed arch with a square base, matching the reference
+   site's proportions. No surround — the opening is cut straight into the page,
+   and only the art behind it cross-fades. */
+.hero__arch { width: 100%; }
 
+/* Fills its grid column edge to edge. aspect-ratio sets the doorway's shape,
+   max-height stops a wide column turning it into a tower. */
 .hero__panel {
   position: relative;
-  aspect-ratio: 7 / 6;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: min(74vh, 620px);
   overflow: hidden;
   background: var(--bg-sink);
-  border-radius: 50% 50% calc(var(--r-lg) - 6px) calc(var(--r-lg) - 6px) / 26% 26% 3% 3%;
+  border-radius: 50% 50% 6px 6px / 40% 40% 6px 6px;
+  box-shadow: var(--sh-2);
+}
+
+/* Torchlight vignette, so the inscription stays readable on any painting. */
+.hero__panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 78% at 50% 108%, rgba(127, 0, 30, .3), transparent 62%),
+    linear-gradient(to top, rgba(18, 16, 14, .8), rgba(18, 16, 14, .06) 58%);
 }
 
 .hero__slide {
@@ -803,21 +841,22 @@ svg use, .sprite symbol {
 .hero__slide.is-on { opacity: 1; }
 .hero__slide img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ithildin: a hairline arch that only shows once the panel has settled */
+/* ithildin: a gilt hairline arch that only shows once the panel has settled */
 .hero__panel::after {
   content: '';
   position: absolute;
-  inset: 14px;
-  border: 1px solid rgba(255, 255, 255, .32);
-  border-radius: 50% 50% 10px 10px / 26% 26% 2% 2%;
+  inset: 11px;
+  z-index: 2;
+  border: 1.5px solid rgba(214, 178, 106, .5);
+  border-radius: 50% 50% 3px 3px / 40% 40% 3px 3px;
   pointer-events: none;
   opacity: 0;
   animation: ithildin 1.6s var(--ease) .5s forwards;
 }
 
 @keyframes ithildin {
-  from { opacity: 0; inset: 26px; }
-  to   { opacity: 1; inset: 14px; }
+  from { opacity: 0; inset: 24px; }
+  to   { opacity: 1; inset: 11px; }
 }
 
 /* The words over the doorway. */
@@ -825,38 +864,19 @@ svg use, .sprite symbol {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 44px;
-  z-index: 2;
+  bottom: 26px;
+  z-index: 3;
   padding-inline: 24px;
-  font-family: var(--display);
-  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
-  line-height: 1.2;
-  letter-spacing: .04em;
+  font-family: var(--label);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: .16em;
+  text-transform: uppercase;
   text-align: center;
-  color: #fff;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, .85), 0 1px 3px rgba(0, 0, 0, .9);
+  color: rgba(255, 250, 240, .94);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .8);
 }
-
-.hero__dots {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 20px;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.hero__dot {
-  width: 26px;
-  height: 4px;
-  background: rgba(255, 255, 255, .42);
-  border-radius: 2px;
-  transition: background var(--fast), transform var(--fast) var(--ease);
-}
-.hero__dot:hover { background: rgba(255, 255, 255, .75); }
-.hero__dot[aria-current='true'] { background: #fff; transform: scaleY(1.6); }
 
 /* ===== the shelf (new arrivals) ========================================== */
 
@@ -864,7 +884,7 @@ svg use, .sprite symbol {
    same line — which is where the plank is drawn. */
 .shelf {
   position: relative;
-  --caption: 78px;
+  --caption: 88px;
   --caption-gap: 14px;
 }
 
@@ -916,26 +936,41 @@ svg use, .sprite symbol {
   .swipe__nav--next { right: -24px; }
 }
 
-/* The bestseller strip: fixed-width cards rather than a fluid grid. */
-.swipe--cards .swipe__track { padding: 6px 2px 10px; }
-.swipe--cards .card { flex: 0 0 clamp(168px, 42vw, 248px); }
+/* The bestseller strip. --per is how many cards fill the track exactly, so on
+   a desktop screen the row lands on five and nothing is half-shown. */
+.swipe--cards .swipe__track {
+  --per: 2;
+  --swipe-gap: clamp(12px, 2.2vw, 22px);
+  gap: var(--swipe-gap);
+  padding: 6px 0 10px;
+}
+@media (min-width: 620px)  { .swipe--cards .swipe__track { --per: 3; } }
+@media (min-width: 1000px) { .swipe--cards .swipe__track { --per: 5; } }
 
-/* The new-arrivals shelf keeps its own bottom alignment. */
+.swipe--cards .card {
+  flex: 0 0 calc((100% - (var(--per) - 1) * var(--swipe-gap)) / var(--per));
+}
+
+/* The new-arrivals shelf keeps its own bottom alignment. Six books fill a
+   desktop row exactly, so each one is a good deal larger than a card. */
 .swipe--shelf .swipe__track {
+  --per: 3;
+  --swipe-gap: clamp(14px, 2.4vw, 26px);
+  gap: var(--swipe-gap);
   align-items: flex-end;
   padding: 26px 4px 0;
   scroll-snap-type: x proximity;
 }
+@media (min-width: 620px)  { .swipe--shelf .swipe__track { --per: 4; } }
+@media (min-width: 1000px) { .swipe--shelf .swipe__track { --per: 6; } }
 .swipe--shelf .swipe__nav { margin-top: -46px; }
 
 /* Each book stands on the plank. Hover pulls it out and straightens it. */
 .shelf__book {
   position: relative;
-  flex: 0 0 clamp(112px, 26vw, 158px);
+  flex: 0 0 calc((100% - (var(--per) - 1) * var(--swipe-gap)) / var(--per));
   transition: transform var(--mid) var(--ease), filter var(--mid) var(--ease);
 }
-.shelf__book:nth-child(even) { flex-basis: clamp(104px, 24vw, 148px); }
-.shelf__book:nth-child(3n)   { flex-basis: clamp(118px, 27vw, 166px); }
 
 .shelf__book:hover,
 .shelf__book:focus-within {
@@ -983,13 +1018,13 @@ svg use, .sprite symbol {
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-family: var(--display);
-  font-size: .95rem;
+  font-size: 1.05rem;
   line-height: 1.2;
   transition: color var(--fast);
 }
 
 .shelf__by {
-  font-size: .75rem;
+  font-size: .8125rem;
   line-height: 1.3;
   color: var(--muted);
   white-space: nowrap;
@@ -998,31 +1033,11 @@ svg use, .sprite symbol {
 }
 
 .shelf__cost {
-  font-size: .8125rem;
+  font-size: .875rem;
   font-weight: 600;
   line-height: 1.3;
   font-variant-numeric: tabular-nums;
   color: var(--link);
-}
-
-/* The plank the books stand on. The captions have a fixed height, so the
-   covers all end on one line — the 9px lets the books sink into the plank
-   instead of hovering above it. */
-.shelf__plank {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--caption) + var(--caption-gap) - 9px);
-  height: 14px;
-  background: linear-gradient(180deg, #9a8b74 0%, #6b5d4a 45%, #4a4033 100%);
-  border-radius: 3px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
-              0 10px 20px -8px rgba(23, 24, 26, .45);
-}
-:root[data-theme='dark'] .shelf__plank {
-  background: linear-gradient(180deg, #4b4235 0%, #322c23 45%, #1e1a15 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1),
-              0 10px 20px -8px rgba(0, 0, 0, .8);
 }
 
 .shelf__hint {
@@ -1182,30 +1197,49 @@ svg use, .sprite symbol {
 .tile span {
   position: relative;
   font-family: var(--display);
-  font-size: 1.0625rem;
-  line-height: 1.15;
+  font-size: 1.38rem;
+  line-height: 1.12;
   text-shadow: 0 1px 10px rgba(0, 0, 0, .7);
 }
 
 /* ===== quote band ======================================================== */
 
-.quote {
-  max-width: 44ch;
-  margin-inline: auto;
-  text-align: center;
+/* Roughly half the height of a normal band. The padding is deliberately equal
+   top and bottom, and align-content centres the block in whatever height the
+   band ends up with, so the quote never rides high or low. */
+.band--quote {
+  display: grid;
+  align-content: center;
+  padding-top: clamp(26px, 3.2vw, 40px);
+  padding-bottom: clamp(26px, 3.2vw, 40px);
 }
+
+/* No stray margins to bias the vertical centring. */
+.quote blockquote, .quote cite { margin-block: 0; }
+
+/* Stays on the shell's grid like every other section — no max-width override,
+   or the quote band would run wider than the rest of the page. */
+.quote { text-align: center; }
+
+/* Sized so the whole quote sits on one line inside the shell. The upper bound
+   matters: without it a wide viewport grows the type past the shell's fixed
+   1160px content box and the ends get clipped. Under 1200px there is no room
+   for one line, so it wraps instead of overflowing. */
 .quote blockquote {
-  font-family: var(--display);
-  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-family: var(--body);
+  font-size: clamp(1.05rem, 2.1vw, 1.65rem);
   line-height: 1.35;
+}
+@media (min-width: 1200px) {
+  .quote blockquote { white-space: nowrap; }
 }
 .quote cite {
   display: block;
-  margin-top: 16px;
+  padding-top: 10px;
   font-family: var(--label);
   font-style: normal;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--gilt);
@@ -1343,6 +1377,78 @@ svg use, .sprite symbol {
 }
 .resultline strong { color: var(--ink); font-weight: 600; }
 
+/* ===== pagination ======================================================= */
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(26px, 4vw, 40px);
+  padding-top: clamp(20px, 3vw, 28px);
+  border-top: 1px solid var(--line);
+}
+
+.pager__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-family: var(--nav);
+  font-size: .8125rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: var(--ink);
+  transition: background var(--fast), border-color var(--fast), color var(--fast);
+}
+.pager__step:hover:not([disabled]) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.pager__step[disabled] { opacity: .4; cursor: not-allowed; }
+.pager__step svg { width: 16px; height: 16px; }
+
+.pager__nums { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pager__num {
+  min-width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-family: var(--nav);
+  font-size: .9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  transition: background var(--fast), border-color var(--fast), color var(--fast);
+}
+.pager__num:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.pager__num[aria-current='page'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.pager__count {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: .9375rem;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .pager__step span { display: none; }
+  .pager__step { padding: 8px 12px; }
+}
+
 /* ===== contact page ===================================================== */
 
 .contact {
@@ -1350,8 +1456,10 @@ svg use, .sprite symbol {
   gap: clamp(20px, 3vw, 32px);
   padding-bottom: clamp(30px, 5vw, 56px);
 }
+/* Both columns share the row height, so the details panel and the map line up
+   top and bottom instead of one dangling below the other. */
 @media (min-width: 900px) {
-  .contact { grid-template-columns: minmax(0, 380px) minmax(0, 1fr); align-items: start; }
+  .contact { grid-template-columns: minmax(0, 380px) minmax(0, 1fr); align-items: stretch; }
 }
 
 .contactcards { display: grid; gap: 12px; margin-bottom: 22px; }
@@ -1398,6 +1506,7 @@ svg use, .sprite symbol {
 a.contactcards__value:hover { color: var(--link); }
 
 .mapframe {
+  display: flex;
   overflow: hidden;
   background: var(--surface-2);
   border: 1px solid var(--line);
@@ -1407,7 +1516,10 @@ a.contactcards__value:hover { color: var(--link); }
 .mapframe iframe {
   display: block;
   width: 100%;
-  height: clamp(300px, 52vh, 520px);
+  /* flex-grow lets the map take the full shared row height; min-height keeps
+     it usable when the details panel is the shorter of the two. */
+  flex: 1 1 auto;
+  min-height: clamp(300px, 46vh, 460px);
   border: 0;
 }
 :root[data-theme='dark'] .mapframe iframe { filter: invert(.9) hue-rotate(180deg) saturate(.7); }
@@ -2246,12 +2358,22 @@ a.contactcards__value:hover { color: var(--link); }
   .mainnav__list li + li { border-top: 1px solid var(--chrome-line); }
 }
 
-@media (max-width: 520px) {
-  .brand__sub { letter-spacing: .18em; font-size: .85rem; }
+@media (max-width: 560px) {
+  /* Keep the name on one line without shoving the tool icons off the bar. */
+  .brand { gap: 7px; }
+  .brand__mark { width: 18px; }
+  .brand__type { gap: 5px; }
+  .brand__name, .brand__sub { font-size: 1.05rem; }
   .iconbtn { width: 38px; height: 38px; }
+  .iconbtn svg { width: 19px; height: 19px; }
+  #theme-toggle .tswap { width: 19px; height: 19px; }
   .tools { gap: 0; }
   .acctmenu { width: min(260px, calc(100vw - 32px)); }
   .footer__base { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 400px) {
+  .brand__name, .brand__sub { font-size: .95rem; }
 }
 
 /* ===== reduced motion =================================================== */

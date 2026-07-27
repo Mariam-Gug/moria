@@ -17,7 +17,10 @@
 
   /* Catalog state. The hash is the source of truth; this is the working copy
      so typing in the search box doesn't re-render the whole page. */
-  const shop = { q: '', genre: '', sort: 'featured', shelf: '' };
+  const shop = { q: '', genre: '', sort: 'featured', shelf: '', page: 1 };
+
+  /* Books per catalog page. Anything at or under this shows in one go. */
+  const PER_PAGE = 16;
 
   const SORTS = {
     featured:   'Featured',
@@ -62,6 +65,8 @@
     if (shop.q) params.set('q', shop.q);
     if (shop.genre) params.set('genre', shop.genre);
     if (shop.sort !== 'featured') params.set('sort', shop.sort);
+
+    if (shop.page > 1) params.set('page', shop.page);
 
     const query = params.toString();
     history.replaceState(null, '', '#/shop' + (query ? '?' + query : ''));
@@ -167,7 +172,7 @@
               '<a class="btn btn--outline" href="#/shop?shelf=new">See what just arrived</a>' +
             '</div>' +
             '<div class="hero__facts">' +
-              '<p class="hero__fact"><b>' + BOOKS.length + '</b><span>titles in stock</span></p>' +
+              '<p class="hero__fact"><b>' + BOOKS.length + '</b><span>books in stock</span></p>' +
               '<p class="hero__fact"><b>' + GENRES.length + '</b><span>genres</span></p>' +
               '<p class="hero__fact"><b>1</b><span>sleeping dragon</span></p>' +
             '</div>' +
@@ -183,13 +188,6 @@
                      '</div>';
             }).join('') +
             '<p class="hero__inscription">The doors stand open</p>' +
-            '<div class="hero__dots" id="hero-dots" role="tablist" aria-label="Choose artwork">' +
-              HERO_SLIDES.map(function (slide, index) {
-                return '<button class="hero__dot" type="button" role="tab" ' +
-                       'data-slide="' + index + '" aria-current="' + (index === 0) + '" ' +
-                       'aria-label="Artwork ' + (index + 1) + ' of ' + HERO_SLIDES.length + '"></button>';
-              }).join('') +
-            '</div>' +
           '</div>' +
           '</div>' +
         '</div>' +
@@ -225,7 +223,6 @@
                   '</div>';
               }).join(''),
               'swipe--shelf') +
-            '<div class="shelf__plank" aria-hidden="true"></div>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -272,10 +269,11 @@
       '</section>' +
 
       /* --- quote --- */
-      '<section class="band">' +
+      '<section class="band band--quote">' +
         '<div class="shell quote reveal">' +
-          '<blockquote>“There is nothing like looking, if you want to find something.”</blockquote>' +
-          '<cite>J.R.R. Tolkien, The Hobbit</cite>' +
+          '<blockquote>“A reader lives a thousand lives before he dies. ' +
+            'The man who never reads lives only once.”</blockquote>' +
+          '<cite>George R.R. Martin, A Dance with Dragons</cite>' +
         '</div>' +
       '</section>';
 
@@ -290,13 +288,10 @@
 
   function showSlide(index) {
     const slides = view.querySelectorAll('.hero__slide');
-    const dots = view.querySelectorAll('.hero__dot');
     if (slides.length === 0) return;
 
     heroAt = (index + slides.length) % slides.length;
-
     slides.forEach(function (slide, i) { slide.classList.toggle('is-on', i === heroAt); });
-    dots.forEach(function (dot, i) { dot.setAttribute('aria-current', String(i === heroAt)); });
   }
 
   function startHeroSlider() {
@@ -314,17 +309,9 @@
       clearInterval(heroTimer);
       if (!still) heroTimer = setInterval(function () { showSlide(heroAt + 1); }, 6000);
     };
+    /* Stop cycling while someone is looking at the painting. */
     panel.addEventListener('mouseenter', hold);
     panel.addEventListener('mouseleave', resume);
-    panel.addEventListener('focusin', hold);
-    panel.addEventListener('focusout', resume);
-
-    el('hero-dots').addEventListener('click', function (event) {
-      const dot = event.target.closest('[data-slide]');
-      if (!dot) return;
-      showSlide(Number(dot.dataset.slide));
-      resume();
-    });
   }
 
   /* ===== view: catalog =================================================== */
@@ -358,6 +345,7 @@
     shop.q = params.get('q') || '';
     shop.genre = GENRES.indexOf(params.get('genre')) !== -1 ? params.get('genre') : '';
     shop.sort = SORTS[params.get('sort')] ? params.get('sort') : 'featured';
+    shop.page = Math.max(1, parseInt(params.get('page'), 10) || 1);
 
     const head = SHELVES[shop.shelf] || {
       eyebrow: 'The whole catalogue',
@@ -418,10 +406,46 @@
     wireCatalog();
   }
 
+  /* Pagination only appears once a result set outgrows one page. */
+  function pagerHtml(total, pages) {
+    if (pages < 2) return '';
+
+    const first = (shop.page - 1) * PER_PAGE + 1;
+    const last = Math.min(total, shop.page * PER_PAGE);
+    let numbers = '';
+
+    for (let page = 1; page <= pages; page++) {
+      numbers +=
+        '<button class="pager__num" type="button" data-page="' + page + '"' +
+        (page === shop.page ? ' aria-current="page"' : '') +
+        ' aria-label="Page ' + page + ' of ' + pages + '">' + page + '</button>';
+    }
+
+    return '' +
+      '<nav class="pager" aria-label="Catalogue pages">' +
+        '<button class="pager__step" type="button" data-page="' + (shop.page - 1) + '" ' +
+                (shop.page === 1 ? 'disabled ' : '') + 'aria-label="Previous page">' +
+          icon('left') + '<span>Previous</span>' +
+        '</button>' +
+        '<div class="pager__nums">' + numbers + '</div>' +
+        '<button class="pager__step" type="button" data-page="' + (shop.page + 1) + '" ' +
+                (shop.page === pages ? 'disabled ' : '') + 'aria-label="Next page">' +
+          '<span>Next</span>' + icon('right') +
+        '</button>' +
+        '<p class="pager__count">Showing ' + first + '–' + last + ' of ' + total + '</p>' +
+      '</nav>';
+  }
+
   function paintShopResults() {
     const list = matchingBooks();
     const box = el('shop-results');
     const filtered = Boolean(shop.q || shop.genre);
+
+    const pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+    /* A filter change can strand the reader past the last page. */
+    if (shop.page > pages) shop.page = pages;
+
+    const onPage = list.slice((shop.page - 1) * PER_PAGE, shop.page * PER_PAGE);
 
     let html =
       '<div class="resultline" role="status">' +
@@ -429,6 +453,7 @@
           (filtered ? ' of ' + shelfSize() : '') +
           (shop.q ? ' matching “' + esc(shop.q) + '”' : '') +
           (shop.genre ? ' in ' + esc(shop.genre) : '') +
+          (pages > 1 ? ' · page ' + shop.page + ' of ' + pages : '') +
         '</span>' +
         (filtered
           ? '<button class="btn btn--ghost btn--sm" type="button" id="shop-clear">Clear filters</button>'
@@ -445,7 +470,7 @@
         '<button class="btn btn--accent" type="button" id="shop-reset">Clear filters</button>'
       );
     } else {
-      html += bookGrid(list);
+      html += bookGrid(onPage) + pagerHtml(list.length, pages);
     }
 
     box.innerHTML = html;
@@ -455,11 +480,24 @@
     const reset = el('shop-reset');
     if (clear) clear.addEventListener('click', clearFilters);
     if (reset) reset.addEventListener('click', clearFilters);
+
+    const pager = box.querySelector('.pager');
+    if (pager) pager.addEventListener('click', function (event) {
+      const button = event.target.closest('[data-page]');
+      if (!button || button.disabled) return;
+
+      shop.page = Math.max(1, Math.min(pages, Number(button.dataset.page)));
+      syncShopUrl();
+      paintShopResults();
+      /* Land at the top of the results, not wherever the old page 2 ended. */
+      el('shop-results').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
   }
 
   function clearFilters() {
     shop.q = '';
     shop.genre = '';
+    shop.page = 1;
     el('shop-q').value = '';
     Shell.setSearchValue('');
     el('shop-genres').querySelectorAll('[data-genre]').forEach(function (chip) {
@@ -472,8 +510,11 @@
   function wireCatalog() {
     /* Search as you type. Only the results block is redrawn, so the caret
        never jumps out of the field. */
+    /* Any change to the filters puts the reader back on page one — page 3 of
+       an old result set means nothing once the set changes. */
     el('shop-q').addEventListener('input', function () {
       shop.q = this.value;
+      shop.page = 1;
       Shell.setSearchValue(shop.q);
       syncShopUrl();
       paintShopResults();
@@ -485,6 +526,7 @@
 
       /* Tapping the active genre again clears it. */
       shop.genre = chip.dataset.genre === shop.genre ? '' : chip.dataset.genre;
+      shop.page = 1;
 
       this.querySelectorAll('[data-genre]').forEach(function (other) {
         other.setAttribute('aria-pressed', String(other.dataset.genre === shop.genre));
@@ -495,6 +537,7 @@
 
     el('shop-sort').addEventListener('change', function () {
       shop.sort = this.value;
+      shop.page = 1;
       syncShopUrl();
       paintShopResults();
     });
@@ -868,8 +911,10 @@
                   '<span class="contactcards__icon">' + icon('pin') + '</span>' +
                   '<span>' +
                     '<span class="contactcards__label">Address</span>' +
-                    '<span class="contactcards__value">118 Akaki Tsereteli Ave<br>' +
-                      'Tbilisi, Georgia</span>' +
+                    '<a class="contactcards__value" ' +
+                       'href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" ' +
+                       'target="_blank" rel="noopener noreferrer">' +
+                      '118 Akaki Tsereteli Ave<br>Tbilisi, Georgia</a>' +
                   '</span>' +
                 '</li>' +
                 '<li>' +
